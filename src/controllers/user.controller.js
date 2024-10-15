@@ -4,10 +4,14 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 // Options for cookies
 const options = {
   httpOnly: true,
-  secure: false,
+  secure: isProduction, // Set to true in production (HTTPS)
+  sameSite: isProduction ? 'None' : 'Lax', // Allow cross-site in production
+  domain: isProduction ? 'https://cosocket-client.vercel.app' : 'http://localhost:3000',
   maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
 };
 
