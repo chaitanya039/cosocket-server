@@ -7,11 +7,17 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 const isProduction = process.env.NODE_ENV === 'production';
 
 // Options for cookies
-const options = {
+/*const options = {
   httpOnly: true,
   secure: isProduction, // Set to true in production (HTTPS)
   sameSite: isProduction ? 'None' : 'Lax', // Allow cross-site in production
   domain: isProduction ? 'https://cosocket-client.vercel.app' : 'http://localhost:3000',
+  maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+};*/
+const options = {
+  httpOnly: true,
+  secure: isProduction, 
+  sameSite: isProduction ? 'None' : 'Lax',
   maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
 };
 
