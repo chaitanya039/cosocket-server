@@ -9,10 +9,10 @@ Return only valid JSON. Do not include any explanations, markdown, or code block
 **Instruction for ChatGPT API:**
 
 You are tasked with generating a detailed quality inspection plan for a specific product. Your output should follow the JSON structure provided below. Each inspection plan must include three key stages: initial inspection, mid-production inspection, and final inspection. Each stage can contain *n* number of steps with step-by-step instructions, including descriptions, parameters to check, and tools required.
-
+There must be exact name of inspection initial_inspection, mid_inspection, final_inspection, do not include other names than this.
 **JSON Structure**:
 - **"product"**: The name of the product being inspected.
-- **"inspection_plan"**: Contains three stages: initial inspection, mid-production inspection, and final inspection.
+- **"inspection_plan"**: Contains three stages: initial_inspection, mid_inspection, and final_inspection.
 
 Each stage will include *n* steps, formatted as:
 - **"step_X"**: Each step should include:
