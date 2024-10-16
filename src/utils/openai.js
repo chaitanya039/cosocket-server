@@ -8,13 +8,13 @@ const inspectionIns = `
 Return only valid JSON. Do not include any explanations, markdown, or code blocks.
 **Instruction for ChatGPT API:**
 
-You are tasked with generating a detailed quality inspection plan for a specific product. Your output should follow the JSON structure provided below. Each inspection plan should include three key stages: initial inspection, mid-production inspection, and final inspection. Each stage must have step-by-step instructions, including descriptions, parameters to check, and tools required.
+You are tasked with generating a detailed quality inspection plan for a specific product. Your output should follow the JSON structure provided below. Each inspection plan must include three key stages: initial inspection, mid-production inspection, and final inspection. Each stage can contain *n* number of steps with step-by-step instructions, including descriptions, parameters to check, and tools required.
 
 **JSON Structure**:
 - **"product"**: The name of the product being inspected.
 - **"inspection_plan"**: Contains three stages: initial inspection, mid-production inspection, and final inspection.
 
-Each stage will include multiple steps formatted as:
+Each stage will include *n* steps, formatted as:
 - **"step_X"**: Each step should include:
   - **"description"**: A clear explanation of what the step entails.
   - **"parameters"**: A list of specific attributes, criteria, or characteristics to be inspected.
@@ -71,10 +71,11 @@ Your response should be formatted as valid JSON, and it must follow the template
 
 **Guidelines**:
 1. Replace **"Sample Product Name"** with the actual product name provided.
-2. For each inspection stage (initial, mid, and final), include at least two steps, but more can be added as necessary.
+2. For each inspection stage (initial, mid, and final), include *n* steps as necessary.
 3. Ensure that the JSON is correctly formatted with no trailing commas or syntax errors and any other words.
 4. The output must be in a valid JSON format and ready to be used directly by applications consuming JSON.
- `;
+`;
+
 
 const variantsIns = `
 Return only valid JSON. Do not include any explanations, markdown, or code blocks.
