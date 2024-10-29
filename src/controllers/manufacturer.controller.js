@@ -248,4 +248,31 @@ const getManufacturerById = AsyncHandler(async (req, res) => {
   }
 });
 
-export { addManufacturers, getManufacturers, getManufacturerById };
+const getTopManufacturers = AsyncHandler(async (req, res) => {
+  // Fetch all manufacturers with rating >= 4.5
+  const manufacturers = await Manufacturer.find({ rating: { $gte: 4.5 } });
+
+  if (!manufacturers || manufacturers.length === 0) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, [], "No top manufacturers found."));
+  }
+
+  // Shuffle the manufacturers to randomize
+  const shuffled = manufacturers.sort(() => 0.5 - Math.random());
+
+  // Select only 15 manufacturers (or fewer if not enough)
+  const selectedManufacturers = shuffled.slice(0, 15);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        selectedManufacturers,
+        "Top 15 manufacturers retrieved successfully!"
+      )
+    );
+});
+
+export { addManufacturers, getManufacturers, getManufacturerById, getTopManufacturers };
