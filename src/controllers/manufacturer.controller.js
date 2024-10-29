@@ -209,4 +209,43 @@ const getManufacturers = AsyncHandler(async (req, res) => {
   }
 });
 
-export { addManufacturers, getManufacturers };
+// Get only one manufacturer on the basis on ID
+const getManufacturerById = AsyncHandler(async (req, res) => {
+  try {
+    // Get ID from params
+    const { id } = req.params;
+
+    // Fetch data from database
+    const data = await Manufacturer.findById(id);
+
+    // Check data exists or not
+    if (!data) {
+      return res
+        .status(400)
+        .json(
+          new ApiResponse(
+            400,
+            {},
+            `Unable to find manufacturer with this id ${id}`
+          )
+        );
+    }
+
+    // Return manufacturer
+    return res
+      .status(200)
+      .json(new ApiResponse(200, data, "Manufacturer retrived successfully!"));
+  } catch (error) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          400,
+          {},
+          `Unable to fetch manufacturer!`
+        )
+      );
+  }
+});
+
+export { addManufacturers, getManufacturers, getManufacturerById };

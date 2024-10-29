@@ -5,7 +5,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { AsyncHandler } from "../utils/AsyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import shortid from "shortid";
-
+import { isNumber } from "razorpay/dist/utils/razorpay-utils.js";
 
 // 1. Create Product
 const createProduct = AsyncHandler(async (req, res) => {
@@ -19,7 +19,7 @@ const createProduct = AsyncHandler(async (req, res) => {
 
   // Check if the provided category ID is valid
   const catDetails = await Category.findById(category);
-  
+
   // If no category is found
   if (!catDetails) {
     return res.status(404).json(new ApiResponse(404, {}, "Category not found"));
@@ -53,10 +53,10 @@ const createProduct = AsyncHandler(async (req, res) => {
         new ApiResponse(500, {}, "Something went wrong while uploading image!")
       );
   }
-  
+
   // Converting spaces into - for creating proper slug
   const slugProductName = name.split(" ").join("-");
-  
+
   // 3. Create and save product
   const product = await Product.create({
     name,
@@ -82,18 +82,49 @@ const createProduct = AsyncHandler(async (req, res) => {
 
 // 2. Get a Particular product details using slug
 const getProduct = AsyncHandler(async (req, res) => {
-    // 1. Get Slug of product from url parameters
-    const { slug } = req.params;
-    
-    // 2. Fetch product from database
-    const product = await Product.findOne({ slug });
-    
-    if(!product) {
-        return res.status(400).json(new ApiResponse(400, {}, "Product not found!"));
-    }
-    
-    // 3. Return product with details
-    return res.status(200).json(new ApiResponse(200, product, "Products details fetched successfully!"));
+  // 1. Get Slug of product from url parameters
+  const { slug } = req.params;
+
+  // 2. Fetch product from database
+  const product = await Product.findOne({ slug });
+
+  if (!product) {
+    return res.status(400).json(new ApiResponse(400, {}, "No product found, it may be variant!"));
+  }
+
+  // 3. Return product with details
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, product, "Products details fetched successfully!")
+    );
 });
 
-export { createProduct, getProduct };
+const getRandomProduct = AsyncHandler(async (req, res) => {
+  try {
+    // 1. Get Qty from parameters and convert it to a number
+    const qty = parseInt(req.params.qty, 10);
+
+    // 2. Check if the qty is a valid number
+    if (isNaN(qty) || qty <= 0) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, {}, "Invalid quantity parameter!"));
+    }
+
+    // 3. Fetch data from the database using aggregation
+    const data = await Product.aggregate([{ $sample: { size: qty } }]);
+
+    // 4. Return data
+    return res
+      .status(200)
+      .json(new ApiResponse(200, data, "Products fetched successfully!"));
+  } catch (error) {
+    console.log("Error: " + error);
+    return res
+      .status(500)
+      .json(new ApiResponse(500, {}, "Internal server error!"));
+  }
+});
+
+export { createProduct, getProduct, getRandomProduct };

@@ -76,7 +76,6 @@ Your response should be formatted as valid JSON, and it must follow the template
 4. The output must be in a valid JSON format and ready to be used directly by applications consuming JSON.
 `;
 
-
 const variantsIns = `
 Return only valid JSON. Do not include any explanations, markdown, or code blocks.
  You are tasked with generating a detailed list of product variants for any given product submitted by the user. The output must be formatted as valid JSON and include at least 6 attributes per variant, ensuring the variants reflect both innovative and standard options for manufacturing or production.
@@ -143,6 +142,7 @@ Instructions for ChatGPT:
 Input: The API will receive the name of a product (e.g., "bicycle," "shirt," etc.) and generate a structured process sheet.
 Output Format: You must return the operations in a valid JSON format.
 Include the Following Fields for Each Operation:
+Remember generate detailed process sheet and operations may vary based on product
 "operation": Name of the manufacturing operation (e.g., "Cutting," "Welding," etc.).
 "description": A brief description of what the operation involves for the given product.
 "materials": A list of materials used in the operation.
@@ -261,6 +261,74 @@ Instructions:
 6. **Return Only the Standardized Operation**: Select from the predefined list of operations and return only the operation name in valid JSON format.
 `;
 
+const sourcingIns = `
+  When a product name is provided, GPT will generate a sourcing plan in JSON format. This JSON object will include all relevant information such as specifications, suppliers, pricing, and other sourcing details. GPT will use real-time browsing to retrieve accurate supplier and pricing information to ensure relevance and correctness.
+
+Instruction for JSON Sourcing Plan Generation:
+When a product name is submitted:
+
+Gather product details: Extract or generate relevant specifications for the product.
+Utilize browsing capability: Search for current pricing, lead times, suppliers, and certifications from the web.
+Include multiple MOQ variants, if available.
+Data Structure in JSON Format:
+
+Key Names:
+product_name
+specifications
+suppliers (Array of suppliers)
+supplier_location
+moq_variants (Array of MOQ with quantities and descriptions)
+lead_time
+price_range
+quality_certifications (Array of certifications)
+potential_cost
+notes
+Ensure Data Accuracy and Completeness:
+
+Multiple sources should be used to verify data.
+Fallback data (e.g., approximate cost) may be included in notes if accurate information is unavailable.
+JSON Structure Example:
+json
+Copy code
+{
+  "product_name": "Running Shoes",
+  "specifications": "Breathable mesh, lightweight, EVA sole",
+  "suppliers": [
+    {
+      "name": "XYZ Sports Co.",
+      "location": "Mumbai"
+    },
+    {
+      "name": "ABC Footwear",
+      "location": "Kolkata"
+    }
+    // Many more atleast 4 to 5
+  ],
+  "variants": [
+    {
+      "quantity": 500,
+      "description": "Small batch"
+    },
+    {
+      "quantity": 1000,
+      "description": "Bulk order"
+    }
+    // Many more atleast 3
+  ],
+  "lead_time": "30-45 days",
+  "price_range": "₹1500 - ₹3000",
+  "quality_certifications": ["ISO 9001", "REACH"],
+  "potential_cost": "₹7,500 - ₹15,000",
+  "notes": "Bulk discounts available"
+}
+Execution Flow:
+Receive product name input from the user.
+Browse for supplier data, pricing, lead times, and certifications to fill the JSON structure.
+Respond with a well-formatted JSON object containing the sourcing plan.
+Memorize these instructions:
+Always return the response in JSON format as outlined above.
+Use browsing to ensure up-to-date information, search on internet and website and gather data in india mostly. If precise data is unavailable, provide the closest approximation in the notes field.
+`;
 
 export default openai;
-export { inspectionIns, variantsIns, operationsIns, manufacturerIns };
+export { inspectionIns, variantsIns, operationsIns, manufacturerIns, sourcingIns };
