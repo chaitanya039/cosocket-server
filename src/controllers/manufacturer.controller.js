@@ -116,23 +116,21 @@ async function normalizeOperationWithMaterial(operation, tools, materials) {
   }
 }
 
-// Get manufacturers based on normalized operation, tools, and materials
 const getManufacturers = AsyncHandler(async (req, res) => {
-  // 1. Get operation, tools, and materials from the request body
   const { operation, tools, materials } = req.body;
 
-  // 2. Normalize the operation with material and tool context
   try {
+    // Normalize the operation with material and tool context
     const normalizedOperation = await normalizeOperationWithMaterial(
       operation,
       tools,
       materials
     );
 
-    // 3. Fetch all manufacturers from the database
+    // Fetch all manufacturers from the database
     const manufacturers = await Manufacturer.find();
 
-    // 4. Calculate scores for each manufacturer based on the normalized operation, tools, and materials
+    // Calculate scores for each manufacturer
     const rankedManufacturers = manufacturers.map((manufacturer) => {
       let score = 0;
 
@@ -141,6 +139,7 @@ const getManufacturers = AsyncHandler(async (req, res) => {
         if (manufacturerOp.name === normalizedOperation) {
           score += 20;
         }
+
         // Fuzzy matching for materials (30% weight)
         const matchingMaterials = materials.filter(
           (material) =>
@@ -150,7 +149,6 @@ const getManufacturers = AsyncHandler(async (req, res) => {
         const materialMatchPercentage =
           matchingMaterials.length / materials.length;
         if (materialMatchPercentage >= 0.7) {
-          // Consider 70% or more as a sufficient match
           score += materialMatchPercentage * 30; // Assign score proportionally
         }
 
@@ -162,7 +160,6 @@ const getManufacturers = AsyncHandler(async (req, res) => {
         );
         const toolMatchPercentage = matchingTools.length / tools.length;
         if (toolMatchPercentage >= 0.7) {
-          // Consider 70% or more as a sufficient match
           score += toolMatchPercentage * 50; // Assign score proportionally
         }
       });
@@ -170,24 +167,35 @@ const getManufacturers = AsyncHandler(async (req, res) => {
       return { manufacturer, score };
     });
 
-    // 5. Sort and filter the manufacturers based on score
+    // Sort and filter the manufacturers based on score
     const filteredAndSortedManufacturers = rankedManufacturers
       .filter((item) => item.score > 0)
       .sort((a, b) => b.score - a.score);
 
     if (filteredAndSortedManufacturers.length <= 0) {
+      // Return a dummy manufacturer if no matches are found
+      const dummyManufacturer = {
+        name: "Cosocket Manufacturer 1",
+        operations: ["General Manufacturing"],
+        tools: ["Standard Tools"],
+        materials: ["Standard Materials"],
+        description:
+          "This is a dummy manufacturer provided by Cosocket for unmatched operations.",
+        rating: 4.5,
+        location: "Global",
+      };
       return res
-        .status(400)
+        .status(200)
         .json(
           new ApiResponse(
-            400,
-            {},
-            `Sorry, do not have manufacturers relevant to it!`
+            200,
+            [dummyManufacturer],
+            "No manufacturers found. Returning a dummy manufacturer."
           )
         );
     }
 
-    // 6. Return the sorted manufacturers in the response
+    // Return the sorted manufacturers in the response
     return res.status(200).json(
       new ApiResponse(
         200,
@@ -196,7 +204,7 @@ const getManufacturers = AsyncHandler(async (req, res) => {
       )
     );
   } catch (error) {
-    // Handle any errors that occur during the normalization or manufacturer fetching process
+    // Handle any errors
     return res
       .status(500)
       .json(
@@ -208,6 +216,7 @@ const getManufacturers = AsyncHandler(async (req, res) => {
       );
   }
 });
+
 
 // Get only one manufacturer on the basis on ID
 const getManufacturerById = AsyncHandler(async (req, res) => {

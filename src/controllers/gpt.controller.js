@@ -163,4 +163,59 @@ const getSourcing = AsyncHandler(async (req, res) => {
   }
 });
 
-export { getInspectionSteps, getVariants, getOperations, getSourcing };
+const getIconForVariant = AsyncHandler(async (req, res) => {
+  try {
+    const { variantName } = req.params;
+
+    if (!variantName) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, {}, "Variant name is required."));
+    }
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are an assistant that maps product variant names to FontAwesome react icon component, use internet because your icon name should be available use Component name directly by using Fa as prefix. Respond only with the FontAwesome icon name, no explanations.",
+        },
+        {
+          role: "user",
+          content: `Provide a FontAwesome icon name for the variant: "${variantName}".`,
+        },
+      ],
+    });
+
+    // Extract and parse the response
+    const iconName = response.choices[0]?.message?.content?.trim();
+    if (!iconName) {
+      throw new Error("No icon name received from OpenAI API.");
+    }
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { iconName },
+          `FontAwesome icon for variant ${variantName} fetched successfully!`
+        )
+      );
+  } catch (error) {
+    console.error("Error fetching FontAwesome icon:", error);
+    return res
+      .status(500)
+      .json(
+        new ApiResponse(
+          500,
+          {},
+          "Failed to fetch FontAwesome icon. Please try again."
+        )
+      );
+  }
+});
+
+
+export { getInspectionSteps, getVariants, getOperations, getSourcing, getIconForVariant };
