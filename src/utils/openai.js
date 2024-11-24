@@ -82,10 +82,8 @@ Return only valid JSON. Do not include any explanations, markdown, or code block
 
 Instructions for Response:
 Product Name: Use the product name provided by the user and generate new product variant name according to specification/customization.
-Product Description: Use the product variant name and generate description for it accordingly.
 Variants List: Provide a list of at least 6 product variants, each with:
 Name: A unique name derived from the product name (Mandatory).
-Description: 20 words of description for that variant.
 Materials: A list of materials relevant to the product's typical use or composition (Mandatory).
 Additional Attributes: Include at least 4 additional attributes relevant to the product. These may vary depending on the type of product and could include, but are not limited to:
 Size
