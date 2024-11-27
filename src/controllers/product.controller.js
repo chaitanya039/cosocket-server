@@ -89,7 +89,9 @@ const getProduct = AsyncHandler(async (req, res) => {
   const product = await Product.findOne({ slug });
 
   if (!product) {
-    return res.status(400).json(new ApiResponse(400, {}, "No product found, it may be variant!"));
+    return res
+      .status(400)
+      .json(new ApiResponse(400, {}, "No product found, it may be variant!"));
   }
 
   // 3. Return product with details
@@ -127,4 +129,38 @@ const getRandomProduct = AsyncHandler(async (req, res) => {
   }
 });
 
-export { createProduct, getProduct, getRandomProduct };
+// Search Product
+// Search Product
+const searchProduct = AsyncHandler(async (req, res) => {
+  try {
+    // Validate query input
+    const query = req.query.q?.trim(); // Trim whitespace if present
+    if (!query || query === "") {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, {}, "Search query cannot be empty!"));
+    }
+
+    console.log("Search Query:", query);
+
+    // Ensure the collection has a text index on the fields to search
+    const response = await Product.find({ $text: { $search: query } });
+
+    if (response.length === 0) {
+      return res
+        .status(404)
+        .json(new ApiResponse(404, {}, "No products found matching the query!"));
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, response, "Products fetched successfully!"));
+  } catch (error) {
+    console.error("Error occurred during product search:", error);
+    return res
+      .status(500)
+      .json(new ApiResponse(500, {}, "Internal server error!"));
+  }
+});
+
+export { createProduct, getProduct, getRandomProduct, searchProduct };
