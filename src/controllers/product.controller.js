@@ -130,7 +130,6 @@ const getRandomProduct = AsyncHandler(async (req, res) => {
 });
 
 // Search Product
-// Search Product
 const searchProduct = AsyncHandler(async (req, res) => {
   try {
     // Validate query input
@@ -143,8 +142,17 @@ const searchProduct = AsyncHandler(async (req, res) => {
 
     console.log("Search Query:", query);
 
-    // Ensure the collection has a text index on the fields to search
-    const response = await Product.find({ $text: { $search: query } });
+    // Check for products where the name or description contains the query anywhere
+    // Use regular expression to match query anywhere in the string
+    const regex = new RegExp(query, 'i');  // 'i' for case-insensitive search
+
+    // Assuming you're searching the 'name' or 'description' fields in your Product model
+    const response = await Product.find({
+      $or: [
+        { name: { $regex: regex } },
+        { description: { $regex: regex } }
+      ]
+    });
 
     if (response.length === 0) {
       return res
@@ -162,5 +170,6 @@ const searchProduct = AsyncHandler(async (req, res) => {
       .json(new ApiResponse(500, {}, "Internal server error!"));
   }
 });
+
 
 export { createProduct, getProduct, getRandomProduct, searchProduct };
